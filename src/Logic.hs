@@ -1,23 +1,39 @@
+{-# LANGUAGE TemplateHaskell, GeneralizedNewtypeDeriving #-}
 
 module Logic where
 
-import qualified Data.IntMap as M
+import Data.Map (Map)
+import qualified Data.Map as M
+import Control.Lens
+import Control.Applicative
+import Control.Monad.State
 
 data Question = Question String Bool
   deriving (Show, Eq)
 
-data Game = Game [(Int, Bool)]
+data GameState = GameState { _answers :: Map Int Int }
   deriving (Show, Eq)
 
-newGame :: Game
-newGame = Game []
+makeLenses ''GameState
 
-question :: Question -> Int -> Game -> Game
-question (Question _ answer) credence (Game results) = Game ((credence, answer) : results)
+newtype Game a = Game (StateT GameState IO a)
+  deriving (Functor, Applicative, Monad, MonadState GameState)
 
-score :: Game -> Double
-score (Game []) = 0
-score (Game ((credence, answer):rest)) = (firstScore * 100) + score (Game rest)
-  where normalise = (/100) . fromIntegral
-        flip = if answer then id else \x -> (1 - x)
-        firstScore = logBase 2 (flip (normalise credence) / 0.5)
+initial :: GameState
+initial = undefined & answers .~ M.empty
+
+question :: Question -> Int -> Game ()
+question (Question _ answer) credence =
+  if answer
+  then answers.at credence.non 0 += 1
+  else answers.at (100 - credence).non 0 += 1
+
+countScore :: Map Int Int -> Double
+countScore m = let l = M.toList m
+               in sum $ flip map l $ \(cr, n) ->
+                    100 * fromIntegral n * logBase 2 (fromIntegral cr / 50)
+
+
+score :: Game Double
+score = uses answers countScore
+
