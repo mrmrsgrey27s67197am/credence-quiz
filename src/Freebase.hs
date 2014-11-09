@@ -9,10 +9,16 @@ import qualified Data.ByteString.Internal as BI
 import qualified Data.ByteString.Lazy.Internal as BLI
 
 
-queryFreebase q = do
+
+getManager :: IO Manager
+getManager = newManager conduitManagerSettings
+
+
+queryFreebase :: Manager -> BI.ByteString -> IO BLI.ByteString
+queryFreebase man q = do
   initReq <- parseUrl freebaseURL
-  man <- newManager conduitManagerSettings
-  httpLbs (setQueryString [("query", Just q)] initReq) man
+  resp <- httpLbs (setQueryString [("query", Just q)] initReq) man
+  return $ responseBody resp
 
 
 freebaseURL = "https://www.googleapis.com/freebase/v1/mqlread"
