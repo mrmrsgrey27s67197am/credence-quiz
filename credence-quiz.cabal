@@ -30,6 +30,8 @@ executable credence-quiz
                        lens-aeson ==1.0.*,
                        aeson ==0.7.*,
                        vector ==0.10.*,
-                       text ==1.1.*
+                       text ==1.1.*,
+                       hashmap ==1.3.*,
+                       scientific ==0.3.*
   hs-source-dirs:      src
   default-language:    Haskell2010
