@@ -1,10 +1,12 @@
+{-# LANGUAGE OverloadedStrings #-}
 
 module Freebase where
 
 import System.IO
 import Network.HTTP.Conduit
 import Network.URI
-import Data.ByteString.Lazy
+import qualified Data.ByteString.Internal as BI
+import qualified Data.ByteString.Lazy.Internal as BLI
 
 
 queryFreebase q = do
@@ -14,3 +16,6 @@ queryFreebase q = do
 
 
 freebaseURL = "https://www.googleapis.com/freebase/v1/mqlread"
+
+exampleQuery :: BI.ByteString
+exampleQuery = "[{\"type\": \"/location/location\", \"name\": null, \"name~=\": \"london city\"}]"
