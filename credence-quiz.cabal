@@ -22,6 +22,10 @@ executable credence-quiz
   build-depends:       base >=4.7 && <4.8, 
                        containers >=0.5 && <0.6,
                        lens ==4.4.*,
-                       mtl ==2.2.*
+                       mtl ==2.2.*,
+                       network ==2.4.*,
+                       HTTP ==4000.2.*,
+                       http-conduit ==2.1.*,
+                       bytestring ==0.10.*
   hs-source-dirs:      src
   default-language:    Haskell2010
