@@ -8,6 +8,7 @@ import Network.URI
 import qualified Data.ByteString.Internal as BI
 import qualified Data.ByteString.Lazy.Internal as BLI
 import Data.Aeson.Lens
+import Data.Aeson.Types
 import Control.Lens
 
 
@@ -16,14 +17,15 @@ getManager :: IO Manager
 getManager = newManager conduitManagerSettings
 
 
-queryFreebase :: Manager -> BI.ByteString -> IO BLI.ByteString
+queryFreebase :: Manager -> BI.ByteString -> IO (Maybe Value)
 queryFreebase man q = do
   initReq <- parseUrl freebaseURL
   resp <- httpLbs (setQueryString [("query", Just q)] initReq) man
-  return $ responseBody resp
+  return $ responseBody resp ^? key "result"
 
 
 freebaseURL = "https://www.googleapis.com/freebase/v1/mqlread"
 
 exampleQuery :: BI.ByteString
-exampleQuery = "[{\"type\": \"/location/location\", \"name\": null, \"name~=\": \"london city\"}]"
+exampleQuery =
+  "[{\"type\": \"/location/location\", \"name\": null, \"name~=\": \"london\"}]"
