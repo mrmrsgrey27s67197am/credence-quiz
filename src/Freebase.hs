@@ -10,18 +10,22 @@ import qualified Data.ByteString.Lazy.Internal as BLI
 import Data.Aeson.Lens
 import Data.Aeson.Types
 import Control.Lens
+import Control.Monad.State
 
+import Logic
 
 
 getManager :: IO Manager
 getManager = newManager conduitManagerSettings
 
 
-queryFreebase :: Manager -> BI.ByteString -> IO (Maybe Value)
-queryFreebase man q = do
-  initReq <- parseUrl freebaseURL
-  resp <- httpLbs (setQueryString [("query", Just q)] initReq) man
-  return $ responseBody resp ^? key "result"
+queryFreebase :: BI.ByteString -> Game (Maybe Value)
+queryFreebase q = do
+  man <- use manager
+  liftIO $ do
+    initReq <- parseUrl freebaseURL
+    resp <- httpLbs (setQueryString [("query", Just q)] initReq) man
+    return $ responseBody resp ^? key "result"
 
 
 freebaseURL = "https://www.googleapis.com/freebase/v1/mqlread"

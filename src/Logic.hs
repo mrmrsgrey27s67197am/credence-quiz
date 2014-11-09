@@ -11,8 +11,10 @@ import Control.Monad.State
 data Question = Question String Bool
   deriving (Show, Eq)
 
-data GameState = GameState { _answers :: Map Int Int }
   deriving (Show, Eq)
+
+data GameState = GameState { _answers :: Map Int Int,
+                             _manager :: Manager }
 
 makeLenses ''GameState
 
