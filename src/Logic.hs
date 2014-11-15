@@ -2,6 +2,7 @@
 
 module Logic where
 
+import Data.Char
 import Data.Map (Map)
 import qualified Data.Map as M
 import Control.Lens
@@ -28,22 +29,22 @@ makeLenses ''GameState
 newtype Game a = Game {game :: StateT GameState IO a}
   deriving (Functor, Applicative, Monad, MonadState GameState, MonadIO)
 
-runGame :: Game a -> IO (a, GameState)
-runGame g = runStateT (game g) initial
-
 initial :: GameState
 initial = undefined & answers .~ M.empty & score .~ 0
 
-question :: Question -> Int -> Game ()
-question (Question q a b answer) credence = do
+question :: Question -> Game ()
+question (Question q a b answer) = do
   userAnswer <- liftIO $ do
     putStrLn $ T.unpack q
     putStrLn $ "A) " ++ T.unpack a
     putStrLn $ "B) " ++ T.unpack b
     getUserAnswer
+  credence <- liftIO getUserCredence
   if answer == userAnswer
-    then answers.at credence.non 0 += 1
-    else answers.at (100 - credence).non 0 += 1
+    then do liftIO $ putStrLn "Correct."
+            answers.at credence.non 0 += 1
+    else do liftIO $ putStrLn "Wrong answer."
+            answers.at (100 - credence).non 0 += 1
 
 getUserAnswer :: IO Answer
 getUserAnswer = do
