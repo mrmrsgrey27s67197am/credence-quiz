@@ -9,7 +9,15 @@ import Control.Monad.State
 import Control.Lens
 
 main :: IO ()
-main = return ()
+main = do x <- runGame askQuestions
+          putStrLn $ show x
+
+askQuestions :: Game ()
+askQuestions = do
+  q <- generateQuestion exampleTemplate
+  question q
+  askQuestions
+
 
 initiateManager :: Game ()
 initiateManager = do
