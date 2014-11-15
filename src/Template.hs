@@ -10,6 +10,7 @@ import Control.Lens
 import Data.Aeson.Types
 import Data.Scientific
 import Data.ByteString.Internal
+import System.Random
 
 import Freebase
 import Logic
@@ -24,8 +25,13 @@ data QuestionTemplate a =
 instance Show (QuestionTemplate a) where
   show QT{ description = s } = show s
 
-chooseTwo :: [a] -> Game (a, a)
-chooseTwo = undefined
+chooseTwo :: [a] -> IO (a, a)
+chooseTwo as = do
+  a <- getStdRandom $ randomR (1, length as)
+  b <- getStdRandom $ randomR (1, length as)
+  if a == b
+    then chooseTwo as
+    else return (as !! pred a, as !! pred b)
 
 deMaybe :: (Maybe a, Maybe b, Maybe c, Maybe d) -> Maybe (a, b, c, d)
 deMaybe = undefined
