@@ -56,6 +56,19 @@ getUserAnswer = do
     _ -> do putStrLn "Don't understand, please try again."
             getUserAnswer
 
+getUserCredence :: IO Int
+getUserCredence = do
+  putStrLn $ "What credence do you assign to that answer? Give a percentage\n" ++
+    "integer probability between 50 and 99."
+  s <- getLine
+  case s of
+    [a, b] -> if isDigit a && isDigit b && a >= '5'
+              then return $ read s
+              else do putStrLn "Don't understand, please try again."
+                      getUserCredence
+    _ -> do putStrLn "Don't understand, please try again."
+            getUserCredence
+
 countScore :: Map Int Int -> Double
 countScore m = let l = M.toList m
                in sum $ flip map l $ \(cr, n) ->
