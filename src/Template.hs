@@ -2,7 +2,7 @@
 
 module Template where
 
-import Data.Text
+import qualified Data.Text as T
 import Data.Map (Map)
 import qualified Data.Map as M
 import Data.Aeson.Lens
@@ -16,10 +16,10 @@ import Freebase
 import Logic
 
 data QuestionTemplate a =
-  QT { description :: Text,
+  QT { description :: T.Text,
        query :: ByteString,
        compProp :: Traversal' Value a,
-       nameProp :: Traversal' Value Text,
+       nameProp :: Traversal' Value T.Text,
        comparator :: a -> a -> Bool }
 
 instance Show (QuestionTemplate a) where
