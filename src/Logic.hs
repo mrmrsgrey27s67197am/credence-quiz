@@ -16,16 +16,23 @@ data Question = Question { qText, aText, bText :: T.Text,
                            answer :: Answer }
   deriving (Show, Eq)
 
+instance Show Manager where
+  show m = "(Manager)"
 data GameState = GameState { _answers :: Map Int Int,
+                             _score :: Double,
                              _manager :: Manager }
+  deriving (Show)
 
 makeLenses ''GameState
 
-newtype Game a = Game (StateT GameState IO a)
+newtype Game a = Game {game :: StateT GameState IO a}
   deriving (Functor, Applicative, Monad, MonadState GameState, MonadIO)
 
+runGame :: Game a -> IO (a, GameState)
+runGame g = runStateT (game g) initial
+
 initial :: GameState
-initial = undefined & answers .~ M.empty
+initial = undefined & answers .~ M.empty & score .~ 0
 
 question :: Question -> Int -> Game ()
 question (Question q a b answer) credence = do
@@ -53,8 +60,3 @@ countScore :: Map Int Int -> Double
 countScore m = let l = M.toList m
                in sum $ flip map l $ \(cr, n) ->
                     100 * fromIntegral n * logBase 2 (fromIntegral cr / 50)
-
-
-score :: Game Double
-score = uses answers countScore
-
